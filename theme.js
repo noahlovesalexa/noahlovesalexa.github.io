@@ -144,15 +144,6 @@
      4. ADMIN SETTINGS & SERVER SYNC
      ────────────────────────────────────────────── */
 
-  // Admin password is verified via local SHA-256 hash comparison.
-  // Only the hash of the correct password is stored — never plaintext.
-  var _VALID_PW_HASH = '84705e64134da52a702d251d47ab82844992dcb0da4eebea18e153998348d152';
-  function _sha256(str) {
-    var buf = new TextEncoder().encode(str);
-    return crypto.subtle.digest('SHA-256', buf).then(function(hash) {
-      return Array.from(new Uint8Array(hash)).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
-    });
-  }
   // getAdminPassword() kept for backward compat only — returns empty.
   function getAdminPassword() { return ''; }
 
@@ -845,11 +836,16 @@
       submitBtn.disabled = true;
       submitBtn.textContent = 'Verifying...';
 
-      // Local SHA-256 hash verification — only accepts the correct password
-      _sha256(pw).then(function(hash) {
-        if (hash === _VALID_PW_HASH) {
+      // Server-side password verification
+      var backendUrl = (typeof OBSIDIAN_BACKEND_URL !== 'undefined' ? OBSIDIAN_BACKEND_URL : 'https://lettuce-cola-resource.ngrok-free.dev');
+      fetch(backendUrl + '/api/auth/verify-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' },
+        body: JSON.stringify({ password: pw })
+      }).then(function(r) { return r.json(); }).then(function(data) {
+        if (data.valid) {
           sessionStorage.setItem('obsidian_admin', 'true');
-          sessionStorage.setItem('obsidian_auth_token', 'offline');
+          sessionStorage.setItem('obsidian_auth_token', data.token || 'verified');
           window.location.href = 'admin.html';
         } else {
           errorMsg.textContent = 'Incorrect password. Try again.';
@@ -860,7 +856,7 @@
           submitBtn.textContent = 'Enter';
         }
       }).catch(function() {
-        errorMsg.textContent = 'Could not verify password. Try again.';
+        errorMsg.textContent = 'Could not reach server. Try again.';
         errorMsg.classList.add('show');
         input.value = '';
         input.focus();
