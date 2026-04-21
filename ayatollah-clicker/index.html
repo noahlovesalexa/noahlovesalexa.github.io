@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ayatollah Clicker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game-container">
+<div id="factory-name-modal" class="modal-overlay">
+<div class="modal-box">
+<h2>Name Your Nuclear Factory</h2>
+<input type="text" id="factory-name-input" placeholder="Enter factory name..." maxlength="40">
+<button id="factory-name-submit" class="btn-gold">Begin Production</button>
+</div>
+</div>
+<div id="top-bar">
+<div id="top-nukes">
+<span class="top-label">Nukes</span>
+<span id="nuke-count">0</span>
+</div>
+<div id="top-nps">
+<span class="top-label">Nukes/sec</span>
+<span id="nuke-per-sec">0</span>
+</div>
+<div id="top-prestige">
+<span class="top-label">Allah's Grace</span>
+<span id="prestige-points">0</span>
+</div>
+<div id="top-buttons">
+<button id="stats-btn" class="top-btn" title="Statistics">Stats</button>
+<button id="settings-btn" class="top-btn" title="Settings">Settings</button>
+<button id="prestige-btn" class="top-btn btn-gold" title="Prestige">Prestige</button>
+</div>
+</div>
+<div id="main-area">
+<div id="left-panel">
+<h3 class="panel-title">Upgrades</h3>
+<div id="upgrade-list"></div>
+</div>
+<div id="center-panel">
+<div id="factory-name-display" title="Click to rename"></div>
+<div id="click-area">
+<div id="particle-container"></div>
+<img src="ayatollah.png" id="ayatollah-img" alt="Ayatollah" draggable="false">
+</div>
+<div id="click-info">
+<span id="click-power-display">+1 per click</span>
+<span id="streak-display">Streak: 0</span>
+</div>
+<button id="ally-boost-btn" title="Call in Russia & China for a 30-second production boost! (10 min cooldown)">
+<span id="ally-boost-icon">☄</span>
+<span id="ally-boost-label">Call Russia & China</span>
+<span id="ally-boost-timer"></span>
+</button>
+</div>
+<div id="right-panel">
+<h3 class="panel-title">Buildings</h3>
+<div id="buy-amount-bar">
+<button class="buy-amt active" data-amt="1">x1</button>
+<button class="buy-amt" data-amt="10">x10</button>
+<button class="buy-amt" data-amt="100">x100</button>
+<button class="buy-amt" data-amt="max">MAX</button>
+</div>
+<div id="building-list"></div>
+</div>
+</div>
+<div id="bottom-bar">
+<h3 class="panel-title">Achievements</h3>
+<div id="achievement-list"></div>
+</div>
+</div>
+<div id="notification-area"></div>
+<div id="stats-modal" class="modal-overlay hidden">
+<div class="modal-box wide-modal">
+<h2>Statistics</h2>
+<div id="stats-content"></div>
+<button class="modal-close btn-gold" data-close="stats-modal">Close</button>
+</div>
+</div>
+<div id="settings-modal" class="modal-overlay hidden">
+<div class="modal-box">
+<h2>Settings</h2>
+<div class="setting-row">
+<label>Factory Name</label>
+<input type="text" id="rename-factory-input" maxlength="40">
+<button id="rename-factory-btn" class="btn-gold">Rename</button>
+</div>
+<div class="setting-row">
+<label>Sound Effects</label>
+<button id="sound-toggle" class="btn-gold">ON</button>
+</div>
+<div class="setting-row">
+<label>Save Game</label>
+<button id="manual-save" class="btn-gold">Save Now</button>
+</div>
+<div class="setting-row">
+<label>Load Game</label>
+<button id="manual-load" class="btn-gold">Load</button>
+</div>
+<div class="setting-row">
+<label>Hard Reset</label>
+<button id="hard-reset" class="btn-gold btn-danger">Reset All</button>
+</div>
+<button class="modal-close btn-gold" data-close="settings-modal">Close</button>
+</div>
+</div>
+<div id="prestige-modal" class="modal-overlay hidden">
+<div class="modal-box">
+<h2>Allah's Grace - Prestige</h2>
+<div id="prestige-info"></div>
+<button id="prestige-confirm" class="btn-gold">Prestige Now</button>
+<button class="modal-close btn-gold" data-close="prestige-modal">Close</button>
+</div>
+</div>
+<div id="event-popup" class="hidden">
+<div id="event-title"></div>
+<div id="event-desc"></div>
+<div id="event-timer"></div>
+</div>
+<div id="admin-panel" class="hidden">
+<div id="admin-header">
+<h2>Admin Panel</h2>
+<button id="admin-close" class="btn-gold">X</button>
+</div>
+<div id="admin-tabs">
+<button class="admin-tab active" data-tab="admin-overview">Overview</button>
+<button class="admin-tab" data-tab="admin-resources">Resources</button>
+<button class="admin-tab" data-tab="admin-buildings">Buildings</button>
+<button class="admin-tab" data-tab="admin-upgrades">Upgrades</button>
+<button class="admin-tab" data-tab="admin-events">Events</button>
+<button class="admin-tab" data-tab="admin-multipliers">Multipliers</button>
+<button class="admin-tab" data-tab="admin-prestige">Prestige</button>
+<button class="admin-tab" data-tab="admin-playerstats">Player Stats</button>
+<button class="admin-tab" data-tab="admin-debug">Debug Tools</button>
+<button class="admin-tab" data-tab="admin-world">World Sim</button>
+<button class="admin-tab" data-tab="admin-visual">Visual</button>
+<button class="admin-tab" data-tab="admin-saveload">Save/Load</button>
+</div>
+<div id="admin-content">
+<div id="admin-overview" class="admin-section active"></div>
+<div id="admin-resources" class="admin-section"></div>
+<div id="admin-buildings" class="admin-section"></div>
+<div id="admin-upgrades" class="admin-section"></div>
+<div id="admin-events" class="admin-section"></div>
+<div id="admin-multipliers" class="admin-section"></div>
+<div id="admin-prestige" class="admin-section"></div>
+<div id="admin-playerstats" class="admin-section"></div>
+<div id="admin-debug" class="admin-section"></div>
+<div id="admin-world" class="admin-section"></div>
+<div id="admin-visual" class="admin-section"></div>
+<div id="admin-saveload" class="admin-section"></div>
+</div>
+</div>
+<button id="admin-toggle-btn" class="hidden">Admin</button>
+<script src="script.js"></script>
+</body>
+</html>
